@@ -102,6 +102,16 @@ button.p{background:linear-gradient(135deg,var(--pri),var(--acc));border-color:t
 .big{font-size:3.6rem;background:linear-gradient(135deg,var(--pri),var(--acc));-webkit-background-clip:text;background-clip:text;color:transparent}
 table{border-collapse:separate;border-spacing:0;overflow:hidden;border:1px solid var(--line);border-radius:14px}
 th{font-size:.78rem;text-transform:uppercase;letter-spacing:.05em;color:var(--mut);background:var(--bg)}td,th{padding:10px 12px}tr:last-child td{border-bottom:0}tr:nth-child(even) td{background:rgba(127,150,175,.07)}
+/* dock ringkas: kotak jawaban kecil, tombol satu baris di kanan */
+.q .dock{margin:auto 8px 6px;padding:8px 12px;border-radius:16px}
+.dk{flex-wrap:nowrap;gap:12px}.dk .ans{flex:0 1 auto;gap:6px 14px;flex-wrap:nowrap}
+.ans label{font-size:.8rem}.ans .f{gap:6px}
+.ans input{flex:0 1 12.5em;width:12.5em;font-size:.95rem;padding:7px 10px;border-radius:10px}
+.btns{flex-wrap:nowrap;margin-left:auto;gap:6px;flex:none}
+.btns button{padding:8px 12px;font-size:.88rem;border-radius:10px;white-space:nowrap}
+.dock .fb{margin:0 0 6px;padding:6px 10px;font-size:.85rem;line-height:1.35;border-radius:10px}
+#cli{margin:0 0 6px;padding:6px 10px;font-size:.8rem;line-height:1.6;border-radius:10px}
+@media(max-width:700px){.dk{flex-wrap:wrap}.dk .ans{flex:1 1 100%}.btns{flex:1 1 100%;justify-content:flex-end;flex-wrap:wrap}}
 .topo{touch-action:pan-y;cursor:grab;scrollbar-width:none;-ms-overflow-style:none;overscroll-behavior-x:contain}.topo::-webkit-scrollbar{display:none}.topo.drag{cursor:grabbing;user-select:none}
 @media print{.pad>.card,.bar+.pad{box-shadow:none}.big{color:var(--acc);-webkit-text-fill-color:currentColor;background:none}}
 @media print{.noprint,.bar button,#ovl{display:none!important}body{background:#fff}}
