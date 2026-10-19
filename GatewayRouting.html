@@ -112,6 +112,12 @@ th{font-size:.78rem;text-transform:uppercase;letter-spacing:.05em;color:var(--mu
 .dock .fb{margin:0 0 6px;padding:6px 10px;font-size:.85rem;line-height:1.35;border-radius:10px}
 #cli{margin:0 0 6px;padding:6px 10px;font-size:.8rem;line-height:1.6;border-radius:10px}
 @media(max-width:700px){.dk{flex-wrap:wrap}.dk .ans{flex:1 1 100%}.btns{flex:1 1 100%;justify-content:flex-end;flex-wrap:wrap}}
+/* keypad angka sendiri (layar sentuh) */
+.kp{display:grid;grid-template-columns:repeat(13,1fr);gap:5px;margin-top:8px}
+.kp button{padding:0;height:40px;font:700 1.05rem ui-monospace,Consolas,monospace;border-radius:10px;background:var(--bg);color:var(--ink);border:1px solid var(--line);touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.kp button:active{background:var(--line)}.kp .bk{color:var(--bad);border-color:var(--bad)}
+.ans input.act{border-color:var(--warn);box-shadow:0 0 0 4px rgba(232,133,31,.22)}.ans input[readonly]{caret-color:transparent}
+@media(max-width:700px){.kp{grid-template-columns:repeat(7,1fr)}}
 .topo{touch-action:pan-y;cursor:grab;scrollbar-width:none;-ms-overflow-style:none;overscroll-behavior-x:contain}.topo::-webkit-scrollbar{display:none}.topo.drag{cursor:grabbing;user-select:none}
 @media print{.pad>.card,.bar+.pad{box-shadow:none}.big{color:var(--acc);-webkit-text-fill-color:currentColor;background:none}}
 @media print{.noprint,.bar button,#ovl{display:none!important}body{background:#fff}}
@@ -292,11 +298,17 @@ function showQ(){app.className='wrap q';const D=S.D,t=S.mode==='tes';
     </div>
     <div class="btns"><button class="p" id="bc" onclick="cek()">${t?'Jawab dan lanjut':'Cek jawaban'}</button>${t?'':'<button id="bh" onclick="hint()">Hint</button>'}
     <button id="ba" style="display:none" onclick="openAnim(S.D,1)">Lihat penjelasannya</button><button id="bn" class="p" style="display:none" onclick="nextQ()">Soal berikutnya</button></div>
-   </div></div>`;
-  $('dst').focus();[$('dst'),$('gw')].forEach(e=>e.addEventListener('keydown',x=>{if(x.key==='Enter')cek()}));
+   </div>${TCH?KP:''}</div>`;
+  const ins=[$('dst'),$('gw')];ins.forEach(e=>e.addEventListener('keydown',x=>{if(x.key==='Enter')cek()}));
+  if(TCH){ins.forEach(e=>{e.readOnly=true;e.inputMode='none';const on=()=>setAct(e);e.addEventListener('focus',on);e.addEventListener('pointerdown',on)});setAct(ins[0]);
+    $('kp').addEventListener('click',x=>{const b=x.target.closest('button');if(!b||!ACT||ACT.disabled)return;const k=b.dataset.k;
+      if(k==='b')ACT.value=ACT.value.slice(0,-1);else if(ACT.value.length<18)ACT.value+=k;})}
+  else $('dst').focus();
 }
+let ACT=null;function setAct(e){ACT=e;['dst','gw'].forEach(i=>$(i).classList.toggle('act',$(i)===e))}
+const KP='<div class="kp" id="kp">'+['1','2','3','4','5','6','7','8','9','0','.','/'].map(k=>`<button type="button" data-k="${k}">${k}</button>`).join('')+'<button type="button" data-k="b" class="bk" aria-label="Hapus">&#9003;</button></div>';
 function fb(c,h){const f=$('fb');f.className='fb '+c;f.innerHTML=h}
-function lock(){$('dst').disabled=$('gw').disabled=true;$('bc').style.display='none';const h=$('bh');if(h)h.style.display='none';$('bn').style.display='';$('ba').style.display=''}
+function lock(){$('dst').disabled=$('gw').disabled=true;const kp=$('kp');if(kp)kp.style.display='none';$('bc').style.display='none';const h=$('bh');if(h)h.style.display='none';$('bn').style.display='';$('ba').style.display=''}
 function cek(){if(S.done)return;const D=S.D,d=$('dst').value,g=$('gw').value;
   if(!d.trim()||!g.trim()){fb('bad','Isi dst-address dan gateway dulu.');return}
   const rd=jDst(D,d),rg=jGw(D,g),ok=!!(rd.ok&&rg.ok);
