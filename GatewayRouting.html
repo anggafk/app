@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes">
+<title>Latihan Gateway Static Route MikroTik</title>
+<style>
+:root{--bg:#f2f6fa;--card:#fff;--ink:#1b2a3b;--mut:#5f6f81;--pri:#12304f;--acc:#0e8a7d;--warn:#e8851f;--bad:#c93c3c;--ok:#23904f;--line:#d3dce6;--pbad:#fdecec;--pok:#e4f5ec;--pwarn:#fef1e2;--pri-t:#fff;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1621;--card:#16222f;--ink:#e6edf5;--mut:#98a8ba;--pri:#7db4f0;--acc:#3cc4b3;--warn:#f5a04d;--bad:#ff7b7b;--ok:#55d08b;--line:#2a3a4c;--pbad:#3a1f24;--pok:#16342a;--pwarn:#3b2c18;--pri-t:#0e1621}}
+:root[data-theme="dark"]{--bg:#0e1621;--card:#16222f;--ink:#e6edf5;--mut:#98a8ba;--pri:#7db4f0;--acc:#3cc4b3;--warn:#f5a04d;--bad:#ff7b7b;--ok:#55d08b;--line:#2a3a4c;--pbad:#3a1f24;--pok:#16342a;--pwarn:#3b2c18;--pri-t:#0e1621}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:none;margin:0;padding:0}.pad{padding:12px 24px 24px}
+h1{font-size:1.6rem;line-height:1.2;margin:8px 0 4px;color:var(--pri)}h2{font-size:1.15rem;margin:0 0 6px;color:var(--pri)}
+p{margin:6px 0}.mut{color:var(--mut)}.sm{font-size:.88rem}
+.card{padding:14px 0;margin:0}.pad>.card:first-child{padding-top:0}.pad>.card+.card{border-top:1px solid var(--line)}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:36px;margin-top:16px}.grid .card{border-top:4px solid var(--pri);padding:12px 0 0}
+@media(max-width:700px){.grid{grid-template-columns:1fr}}
+button{font:inherit;cursor:pointer;border-radius:8px;border:1px solid var(--pri);background:transparent;color:var(--pri);padding:9px 16px;font-weight:600}
+button.p{background:var(--pri);color:var(--pri-t)}button:hover{filter:brightness(1.1)}
+button:focus-visible,input:focus-visible{outline:3px solid var(--warn);outline-offset:2px}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;align-items:center}
+input{font:inherit;padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);width:100%}
+label{display:block;font-weight:600;margin:10px 0 4px}
+.bar{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;background:var(--pri);color:var(--pri-t);border-radius:0;padding:10px 24px}
+.bar button{border-color:var(--pri-t);color:var(--pri-t);padding:5px 12px}.who{font-weight:700}
+.qt{background:#f2f6fa;color:#12304f;text-align:center;font-weight:800;font-size:clamp(18px,2.6vw,36px);line-height:1.2;padding:14px 20px 0}.topo{height:calc(100dvh - 400px);min-height:300px;background:#f2f6fa;overflow-x:auto}.topo svg{display:block;min-width:700px;width:100%;height:100%}.dock{padding:12px 24px 18px;border-top:1px solid var(--line)}.q{display:flex;flex-direction:column;min-height:100dvh}.q .dock{margin-top:auto;position:sticky;bottom:0;z-index:5;background:var(--bg);box-shadow:0 -6px 14px rgba(18,48,79,.08)}
+@media(max-width:900px){.topo{height:auto}.topo svg{min-width:900px;height:auto}.pad,.dock,.bar{padding-left:14px;padding-right:14px}}
+svg text{font-family:ui-monospace,Consolas,monospace;text-anchor:middle;fill:#1b2a3b}svg text.s{text-anchor:start}svg text.e{text-anchor:end}
+.cmd{font:600 .95rem/2.2 ui-monospace,Consolas,monospace;background:#12304f;color:#fff;border-radius:8px;padding:10px 12px}
+.cmd code{font-weight:700;word-break:break-all}.cmd .k{color:#9fd0ff}.cmd .v{color:#ffd28a}
+.ans{display:flex;flex-direction:row;flex-wrap:wrap;gap:10px 18px}.ans .f{display:flex;align-items:center;gap:8px;flex:0 1 auto;min-width:0}
+.ans label{margin:0;flex:none;font:700 .9rem ui-monospace,Consolas,monospace;color:var(--pri)}
+.ans input{flex:0 1 13.5em;width:13.5em;min-width:0;font:600 1.05rem ui-monospace,Consolas,monospace;padding:10px 12px;border:2px solid var(--warn)}
+.ans input:disabled{opacity:.75;border-color:var(--line)}
+.ans input.okk{border-color:var(--ok);background:var(--pok)}
+@media(max-width:520px){.ans .f{flex:1 1 0;flex-direction:column;align-items:stretch;gap:2px}.ans label{flex:none}.ans input{width:100%;flex:none}}
+.dk{display:flex;gap:14px;align-items:center;flex-wrap:wrap}.dk .ans{flex:0 1 auto;min-width:0}
+.btns{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.dock .fb{margin:0 0 10px}#cli{margin:0 0 10px;display:none}
+@media(max-width:700px){.dk .ans{flex:1 1 100%}}
+.fb{margin-top:12px;padding:10px 12px;border-radius:8px;display:none}
+.fb.ok{display:block;background:var(--pok);border-left:4px solid var(--ok)}.fb.bad{display:block;background:var(--pbad);border-left:4px solid var(--bad)}.fb.hint{display:block;background:var(--pwarn);border-left:4px solid var(--warn)}
+.chip{display:inline-block;border:1px solid var(--line);border-radius:99px;padding:2px 10px;margin:2px 4px 2px 0;font-size:.9rem}
+table{width:100%;border-collapse:collapse;font-size:.88rem}td,th{padding:6px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+td code{font-family:ui-monospace,Consolas,monospace;font-size:.85rem;word-break:break-all}
+.big{font-size:2.6rem;font-weight:800;color:var(--acc);line-height:1}.good{color:var(--ok);font-weight:700}.wrong{color:var(--bad);font-weight:700}
+code{font-family:ui-monospace,Consolas,monospace;font-weight:600}
+#ovl{position:fixed;inset:0;background:#f2f6fa;display:none;flex-direction:column;z-index:10;padding:env(safe-area-inset-top,0px) 12px env(safe-area-inset-bottom,0px);color:#12304f}#ovl.on{display:flex}
+#cl{position:absolute;top:calc(10px + env(safe-area-inset-top,0px));right:14px;z-index:11;width:56px;height:56px;padding:0;display:flex;align-items:center;justify-content:center;background:transparent;border:0;border-radius:50%;color:#12304f;opacity:.8}#cl:hover,#cl:focus-visible{opacity:1;filter:none}#cl svg{width:30px;height:30px}
+#asv{flex:1;min-height:0;width:100%}
+.cap{text-align:left;transition:opacity .3s;padding:0 64px 0 0}
+#t{font-size:clamp(16px,2.3vw,30px);font-weight:800;line-height:1.15;padding-top:6px;box-sizing:content-box;height:1.2em;flex:none}
+#b{font-size:clamp(13px,1.6vw,19px);font-weight:600;line-height:1.3;color:#334e68;box-sizing:content-box;height:2.6em;padding-bottom:4px;flex:none}
+@media(max-width:700px){#t{height:2.4em}#b{height:3.9em}}
+.kv{display:inline-flex;align-items:center;gap:6px;margin-right:14px;font-size:clamp(12px,1.5vw,17px);line-height:1.3;vertical-align:middle}.kv i{font-style:normal;font-weight:700;color:var(--pri)}
+.kv span{font:700 1em ui-monospace,Consolas,monospace;border:2px solid var(--ok);background:var(--pok);padding:1px 10px;border-radius:8px;color:#12304f}
+.code{display:inline-block;margin-top:4px;font:700 clamp(12px,1.5vw,18px)/1.5 ui-monospace,Consolas,monospace;background:#12304f;color:#fff;padding:4px 12px;border-radius:8px;text-align:left}
+#ft{text-align:center;font-size:12px;color:#7a8896;padding-bottom:8px}
+#go{position:absolute;right:14px;bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:11;width:56px;height:56px;padding:0;display:flex;align-items:center;justify-content:center;background:transparent;border:0;border-radius:50%;color:#12304f;opacity:.8}#go:hover,#go:focus-visible{opacity:1;filter:none}#go svg{width:30px;height:30px}
+.glow{animation:gl .7s infinite alternate}@keyframes gl{from{opacity:1}to{opacity:.35}}
+#rot{display:none;position:fixed;inset:0;z-index:50;background:var(--pri);color:var(--pri-t);flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;padding:24px}#rot.on{display:flex}
+#rot svg{width:72px;height:72px;animation:rt 2.4s ease-in-out infinite}@keyframes rt{0%,25%{transform:rotate(0)}60%,100%{transform:rotate(-90deg)}}
+#rot button{background:var(--pri-t);color:var(--pri);border-color:var(--pri-t);padding:12px 22px}#rot a{color:inherit;opacity:.75;font-size:.9rem;text-decoration:underline;cursor:pointer}
+@media(orientation:landscape) and (max-height:500px){.topo{height:auto;min-height:0}.topo svg{min-width:0;height:auto}.qt{padding:6px 14px 0;font-size:16px}.dock{padding:8px 14px 10px}}
+/* beranda */
+.hm{max-width:1080px;margin:0 auto;padding:clamp(16px,4vw,48px) clamp(14px,4vw,28px)}
+.hero{position:relative;display:flex;gap:28px;align-items:center;justify-content:space-between;flex-wrap:wrap;padding:clamp(22px,4vw,40px);border-radius:24px;background:linear-gradient(135deg,var(--pri),var(--acc));color:var(--pri-t);overflow:hidden}
+.hero:after{content:"";position:absolute;right:-60px;top:-80px;width:260px;height:260px;border-radius:50%;background:rgba(255,255,255,.12);pointer-events:none}
+.hero .chip{display:inline-block;padding:4px 12px;border-radius:999px;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.35);font-size:.78rem;font-weight:700;letter-spacing:.05em}
+.hero h1{color:inherit;font-size:clamp(1.7rem,4.4vw,2.9rem);line-height:1.1;letter-spacing:-.02em;margin:12px 0 8px}
+.hero p{margin:0;max-width:30em;opacity:.92;font-size:clamp(.95rem,1.8vw,1.1rem)}
+.hero-art{width:clamp(150px,26vw,250px);height:auto;flex:none;position:relative;z-index:1}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:20px}
+.tile{display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:22px;box-shadow:0 6px 24px rgba(18,48,79,.08);transition:transform .15s,box-shadow .15s}
+.tile:hover{transform:translateY(-3px);box-shadow:0 12px 30px rgba(18,48,79,.15)}
+.tile .ico{width:48px;height:48px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(135deg,var(--pri),var(--acc));color:var(--pri-t);margin-bottom:14px}.tile .ico svg{width:26px;height:26px}
+.tile h2{font-size:1.2rem;margin:0 0 4px}.tile p{color:var(--mut);margin:0 0 14px;font-size:.95rem}
+.tile label{margin:8px 0 4px;font-size:.88rem}.tile input{border-radius:12px;padding:10px 12px}
+.tile .cta{margin-top:auto;width:100%;padding:12px 16px;border-radius:12px;font-size:1rem}
+.tile #err{margin-top:6px}
+@media(max-width:800px){.tiles{grid-template-columns:1fr}.hero-art{display:none}}
+@media(prefers-reduced-motion:reduce){.tile{transition:none}.tile:hover{transform:none}}
+/* tampilan isi (soal, siap tes, hasil) */
+.bar{background:linear-gradient(90deg,var(--pri),var(--acc));padding:10px 20px;font-weight:600;box-shadow:0 2px 12px rgba(18,48,79,.18)}
+.bar button{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.45);border-radius:999px;padding:5px 14px}
+button{border-radius:12px;padding:10px 18px;transition:transform .12s,filter .12s}button:active{transform:scale(.97)}
+button.p{background:linear-gradient(135deg,var(--pri),var(--acc));border-color:transparent;box-shadow:0 4px 12px rgba(18,48,79,.2)}
+.qt{font-size:clamp(17px,2.2vw,28px);padding:16px 20px 2px;letter-spacing:-.01em}
+.q .dock{margin:auto 12px 10px;padding:14px 18px;background:var(--card);border:1px solid var(--line);border-radius:20px;box-shadow:0 10px 30px rgba(18,48,79,.18)}
+.ans input{background:var(--bg);border:2px solid var(--line);border-radius:12px;padding:10px 12px}
+.ans input:focus-visible{outline:none;border-color:var(--warn);box-shadow:0 0 0 4px rgba(232,133,31,.22)}
+.fb{border-radius:12px;padding:10px 14px;font-size:.96rem;line-height:1.45}
+.cmd{border-radius:12px;padding:12px 14px;line-height:1.8;box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
+.bar+.pad{margin:6vh 14px 0;padding:32px 24px;text-align:center;background:var(--card);border:1px solid var(--line);border-radius:24px;box-shadow:0 10px 30px rgba(18,48,79,.12)}
+.bar+.pad h1{font-size:clamp(1.6rem,4vw,2.1rem)}.bar+.pad .row{justify-content:center}
+@media(min-width:620px){.bar+.pad{max-width:540px;margin:8vh auto 0}}
+.pad{max-width:980px;margin-left:auto;margin-right:auto}
+.pad>.card,.pad>.card:first-child,.pad>.card+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:20px 22px;margin:0 0 16px;box-shadow:0 6px 20px rgba(18,48,79,.08)}
+.pad>.card:first-child{margin-top:8px}
+.pad .chip{background:var(--bg);border-color:var(--line);padding:3px 12px}
+.big{font-size:3.6rem;background:linear-gradient(135deg,var(--pri),var(--acc));-webkit-background-clip:text;background-clip:text;color:transparent}
+table{border-collapse:separate;border-spacing:0;overflow:hidden;border:1px solid var(--line);border-radius:14px}
+th{font-size:.78rem;text-transform:uppercase;letter-spacing:.05em;color:var(--mut);background:var(--bg)}td,th{padding:10px 12px}tr:last-child td{border-bottom:0}tr:nth-child(even) td{background:rgba(127,150,175,.07)}
+@media print{.pad>.card,.bar+.pad{box-shadow:none}.big{color:var(--acc);-webkit-text-fill-color:currentColor;background:none}}
+@media print{.noprint,.bar button,#ovl{display:none!important}body{background:#fff}}
+</style></head>
+<body>
+<div class="wrap" id="app"></div>
+<div id="ovl"><button id="cl" aria-label="Tutup" onclick="closeAnim()"><svg viewBox="0 0 24 24"><path d="M5 5l14 14M19 5L5 19" stroke="currentColor" stroke-width="3" stroke-linecap="round" fill="none"/></svg></button>
+<div class="cap" id="t"></div><div class="cap" id="b"></div><svg id="asv" viewBox="0 0 840 392" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Penjelasan topologi"></svg>
+<button id="go" style="display:none">Ulangi</button></div>
+<div id="rot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18.5h2"/></svg>
+<div style="font-size:1.25rem;font-weight:800">Putar HP ke mode landscape</div><div class="sm" style="opacity:.85">Aplikasi ini lebih nyaman dipakai dengan layar mendatar.</div>
+<button id="rotb">Layar penuh &amp; landscape</button><a id="rots">Lanjutkan tanpa memutar</a></div>
+<script>
+const $=i=>document.getElementById(i),sl=ms=>new Promise(r=>setTimeout(r,ms)),rn=n=>Math.floor(Math.random()*n);
+const ip=n=>[n>>>24,(n>>>16)&255,(n>>>8)&255,n&255].join('.');
+const A=(a,b,c,d)=>((a*256+b)*256+c)*256+d;
+const BAD=[[A(0,0,0,0),8],[A(127,0,0,0),8],[A(169,254,0,0),16],[A(100,64,0,0),10],[A(192,0,0,0),24],[A(192,0,2,0),24],[A(198,18,0,0),15],[A(198,51,100,0),24],[A(203,0,113,0),24],[A(224,0,0,0),3]];
+function rnet(p){const s=2**(32-p);for(;;){let b=(1+rn(223))*16777216+rn(16777216);b-=b%s;if(!BAD.some(([c,q])=>b<c+2**(32-q)&&c<b+s))return{b,p,s}}}
+const cidr=n=>ip(n.b)+'/'+n.p;
+const TCH=matchMedia('(pointer:coarse)').matches;let rotSkip=false;
+async function goFS(){try{if(!document.fullscreenElement&&document.documentElement.requestFullscreen)await document.documentElement.requestFullscreen({navigationUI:'hide'})}catch(e){}
+  try{await screen.orientation.lock('landscape')}catch(e){}chkRot()}
+function chkRot(){$('rot').classList.toggle('on',!rotSkip&&TCH&&innerWidth<=700&&innerHeight>innerWidth)}
+if(TCH){addEventListener('click',()=>goFS(),{once:true});addEventListener('resize',chkRot);addEventListener('orientationchange',chkRot);
+  $('rotb').onclick=e=>{e.stopPropagation();goFS()};$('rots').onclick=e=>{e.stopPropagation();rotSkip=true;chkRot()};chkRot()}
+function gen(){
+  let N;for(;;){N=[0,0,0].map(()=>[27,28,29][rn(3)]).concat([30,30,24]).map(rnet);if(N.every((x,i)=>N.every((y,j)=>i==j||!(x.b<y.b+y.s&&y.b<x.b+x.s))))break}
+  const pick=(n,ex=[])=>{let h;do h=n.b+1+rn(n.s-2);while(ex.includes(h));return h};
+  const rooms=[0,1,2].map(i=>{const n=N[i],r=n.b+2+rn(n.s-3),h=[];while(h.length<3){const x=pick(n,[r,...h]);h.push(x)}return{n,r,h:h.sort((a,b)=>a-b)}});
+  const lk=[N[5],N[3],N[4]].map((n,i)=>{let a,b;if(i==0){a=pick(n);b=pick(n,[a])}else{a=n.b+1;b=n.b+2;if(rn(2))[a,b]=[b,a]}return{n,l:a,r:b}});
+  const sh=()=>[1,2,3].sort(()=>Math.random()-.5);
+  const R=[0,1,2].map(i=>{const e=sh();return{name:'ABC'[i],L:e[0],R:e[1],B:e[2]}});
+  const s=rn(3),cands=[0,1,2].filter(j=>j!=s).map(j=>({room:j,pos:j+1})).concat([{room:null,pos:0}]),d=cands[rn(cands.length)];
+  const dir=d.pos<s+1?-1:1,li=dir<0?s:s+1;
+  const nbEth=dir<0?(s==0?null:R[s-1].R):R[s+1].L;
+  const nbName=dir<0?(s==0?'ISP':'Router '+R[s-1].name):'Router '+R[s+1].name;
+  return{N,rooms,lk,R,s,d,dir,li,gw:dir<0?lk[s].l:lk[s+1].r,ourIp:dir<0?lk[s].r:lk[s+1].l,ourEth:dir<0?R[s].L:R[s].R,
+    nbEth,nbName,dst:d.room!=null?cidr(N[d.room]):'0.0.0.0/0',far:Math.abs(d.pos-(s+1))>1};
+}
+const ppl=(x,y,t,fs)=>{const w=t.length*fs*.6,ix=x+8-w/2-10;return `<rect x="${ix-6.5}" y="${y-8}" width="13" height="9" rx="1.8" fill="#12304f"/><rect x="${ix-5}" y="${y-6.5}" width="10" height="6" rx=".8" fill="#7dd8ff"/><rect x="${ix-1}" y="${y+1}" width="2" height="2" fill="#12304f"/><rect x="${ix-4.5}" y="${y+3}" width="9" height="1.8" rx=".9" fill="#12304f"/><text x="${x+8}" y="${y+3}" font-size="${fs}">${t}</text>`};
+const ovl=$('ovl'),asv=$('asv'),go=$('go'),tt=$('t'),bb=$('b');let tok=0,curD=null;
+let paused=false,frozen=[];const psl=async ms=>{let l=ms;while(l>0){await sl(40);if(!paused)l-=40}};
+async function cap(t,b){tt.style.opacity=0;bb.style.opacity=0;await psl(300);tt.innerHTML=t;bb.innerHTML=b;tt.style.opacity=1;bb.style.opacity=1}
+const Cx=[225,465,705],ringAt=(x,y,c)=>y>120?`<rect class="glow" x="${x-19}" y="${y-9}" width="38" height="18" rx="4" fill="none" stroke="${c}" stroke-width="4"/>`:`<rect class="glow" x="${x-9}" y="${y-19}" width="18" height="38" rx="4" fill="none" stroke="${c}" stroke-width="4"/>`,
+arrow=(x,d,c)=>`<polygon points="${[[-11,-7],[2,-7],[2,-13],[11,0],[2,13],[2,7],[-11,7]].map(q=>(x+d*q[0]*.8)+','+(100+q[1]*.8)).join(' ')}" fill="${c}" stroke="#fff" stroke-width="1.5"/>`;
+async function play(D){
+  const my=++tok,W=async ms=>{await psl(ms);if(tok!==my)throw 0};curD=D;paused=false;frozen=[];go.innerHTML=IC_PAUSE;go.setAttribute('aria-label','Jeda');go.dataset.m='run';go.style.display='';
+  const s=D.s,dir=D.dir,cx=Cx[s],nm=nmOf(D),r=D.R[s],side=dir<0?'kiri':'kanan';
+  const ourX=cx+dir*45,nbX=dir<0?(s==0?54:Cx[s-1]+45):Cx[s+1]-45,startX=cx+dir*34,dest=D.d.room!=null?Cx[D.d.room]:30;
+  asv.innerHTML=qInner(D)+`<defs><marker id="ah" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="4" markerHeight="4" orient="auto"><path d="M0 0L10 5L0 10z" fill="#c93c3c"/></marker></defs><g id="rg"></g><circle id="pk" r="9" fill="#c93c3c" stroke="#fff" stroke-width="2.5" style="opacity:0;transform:translate(${startX}px,100px);transition:transform 1.4s ease-in-out,opacity .3s"/>`;
+  const rg=$('rg'),pk=$('pk'),mv=(x,y)=>pk.style.transform=`translate(${x}px,${y}px)`;
+  
+  try{
+    await cap(`Konfigurasi Routing Statis dari ${nm} ke ${D.d.room!=null?'Ruangan '+(D.d.room+1):'Internet'}`,`dst-address = ${D.dst}<br>Gateway-nya IP yang mana?`);await W(3600);
+    rg.innerHTML=ringAt(cx-45,100,'#e8851f')+(s<2?ringAt(cx+45,100,'#e8851f'):'')+ringAt(cx,150,'#e8851f');
+    cap('Interface milik '+nm,`${nm} punya ${s<2?'tiga':'dua'} interface: ether${r.L}${s<2?', ether'+r.R:''}, dan ether${r.B}`);await W(3800);
+    rg.innerHTML=ringAt(ourX,100,'#e8851f')+arrow(ourX+dir*16,dir,'#e8851f');pk.style.opacity=1;
+    cap(`Tujuan ada di sisi ${side}`,`Keluar lewat interface <b>ether${D.ourEth}</b>`);await W(3200);
+    mv(ourX,100);await W(1500);mv(nbX,100);await W(1500);
+    rg.innerHTML=ringAt(ourX,100,'#e8851f')+arrow(ourX+dir*16,dir,'#e8851f')+ringAt(nbX,100,'#1fb86a');
+    cap('Gateway = IP interface router seberang (next hop)',`Router seberang di ujung link: ${D.nbName}${D.nbEth?' ether'+D.nbEth:''}<br>IP interface-nya <b>${ip(D.gw)}</b>`);await W(4500);
+    cap('Selanjutnya tugas router seberang',D.far?'Gateway tetap router yang terhubung langsung,<br>bukan router tujuan.':'Dia yang meneruskan ke tujuan.');
+    rg.innerHTML+=`<polyline points="${nbX},100 ${dest},100${D.d.room!=null?' '+dest+',222':''}" fill="none" stroke="#c93c3c" stroke-width="4" stroke-dasharray="9 7" marker-end="url(#ah)" opacity=".85"/>`;
+    mv(dest,100);await W(1700);if(D.d.room!=null){mv(dest,330);await W(1700)}else await W(300);
+    await cap(`<span class="kv"><i>Dst. Address</i><span>${D.dst}</span></span><span class="kv"><i>Gateway</i><span>${ip(D.gw)}</span></span>`,`<span class="code">/ip route add dst-address=${D.dst} gateway=${ip(D.gw)}</span>`);
+    await W(1500);go.innerHTML=IC_REP;go.setAttribute('aria-label',fixedD?'Ulangi':'Contoh lain');go.dataset.m='rep';go.style.display='';
+  }catch(e){}
+}
+const IC_PAUSE='<svg viewBox="0 0 24 24"><path d="M7 4h4v16H7zM13 4h4v16h-4z" fill="currentColor"/></svg>',IC_PLAY='<svg viewBox="0 0 24 24"><path d="M6 4l14 8-14 8z" fill="currentColor"/></svg>',IC_REP='<svg viewBox="0 0 24 24"><path d="M12 5V2L7 6l5 4V7a5 5 0 1 1-5 5H5a7 7 0 1 0 7-7z" fill="currentColor"/></svg>';
+function prep(D){
+  tok++;paused=false;frozen=[];curD=D;asv.innerHTML=qInner(D)+'<g id="rg"></g>';
+  tt.innerHTML=`Konfigurasi Routing Statis dari ${nmOf(D)} ke ${D.d.room!=null?'Ruangan '+(D.d.room+1):'Internet'}`;bb.innerHTML='';tt.style.opacity=1;bb.style.opacity=1;
+  go.innerHTML=IC_PLAY;go.setAttribute('aria-label','Mulai');go.dataset.m='play';go.style.display='';
+}
+function setPause(v){paused=v;go.innerHTML=v?IC_PLAY:IC_PAUSE;go.setAttribute('aria-label',v?'Lanjutkan':'Jeda');go.dataset.m=v?'paused':'run';
+  if(v){frozen=ovl.getAnimations({subtree:true}).filter(a=>a.playState==='running');frozen.forEach(a=>a.pause())}else{frozen.forEach(a=>a.play());frozen=[]}}
+go.onclick=()=>{const m=go.dataset.m;if(m==='run')return setPause(true);if(m==='paused')return setPause(false);
+  if(m==='play')return play(curD);
+  if(fixedD)return prep(curD);
+  let D;do D=gen();while(D.s===curD.s&&D.d.room===curD.d.room);prep(D)};
+let fixedD=false;
+function openAnim(D,fixed){fixedD=!!fixed;ovl.classList.add('on');prep(D)}
+function closeAnim(){tok++;paused=false;frozen=[];ovl.classList.remove('on')}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeAnim()});
+
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const app=$('app'),nmOf=D=>'Router '+D.R[D.s].name;let S={};
+function qInner(D){
+  const C=[225,465,705],hit=D.d.room==null;let o='';
+  const band=(a,b)=>`<rect x="${a}" y="85" width="${b-a}" height="30" fill="#7dd8ff"/>`;
+  o+=band(54,180)+band(270,420)+band(510,660);
+  [[104,0],[345,1],[585,2]].forEach(([x,i])=>o+=`<text x="${x}" y="104" font-size="9.5" font-weight="800" style="fill:#12304f">${cidr(D.lk[i].n)}</text>`);
+  o+=`<rect ${hit?'class="glow"':''} x="6" y="70" width="48" height="60" rx="12" fill="${hit?'#fdecec':'#fff'}" stroke="${hit?'#c93c3c':'#12304f'}" stroke-width="${hit?4:2}"/><text x="30" y="105" font-size="14" font-weight="800">ISP</text>`;
+  const lab=(c,x,y,e,a)=>`<text class="${c}" x="${x}" y="${y}" font-size="10" font-weight="800">${e}</text><text class="${c}" x="${x}" y="${y+12}" font-size="10">${a}</text>`;
+  const X=[[54,180],[270,420],[510,660]];
+  D.R.forEach((r,i)=>{const cx=C[i],src=i==D.s,L=D.lk[i],rm=D.rooms[i],dd=D.d.room===i;
+    o+=`<rect x="${cx-45}" y="50" width="90" height="100" rx="16" fill="${src?'#e8851f':'#e9e9e9'}" stroke="#111" stroke-width="2.5"/><text x="${cx}" y="120" font-size="58" font-weight="900">${r.name}</text>`;
+    o+=`<rect x="${cx-50}" y="85" width="10" height="30" rx="2" fill="#fff" stroke="#111" stroke-width="2"/><rect x="${cx-15}" y="145" width="30" height="10" rx="2" fill="#fff" stroke="#111" stroke-width="2"/>`;
+    if(i<2)o+=`<rect x="${cx+40}" y="85" width="10" height="30" rx="2" fill="#fff" stroke="#111" stroke-width="2"/>`;
+    o+=lab('s',X[i][0]+4,62,i==0?'ISP':'ether'+D.R[i-1].R,ip(L.l)+'/'+L.n.p).replace(/y="62"/,'y="64"');
+    o+=lab('e',X[i][1]-4,130,'ether'+r.L,ip(L.r)+'/'+L.n.p);
+    o+=`<rect x="${cx-12}" y="156" width="24" height="74" fill="#fef6d3"/>`+lab('s',cx+18,178,'ether'+r.B,ip(rm.r)+'/'+D.N[i].p);
+    o+=`<rect ${dd?'class="glow"':''} x="${cx-90}" y="230" width="180" height="156" rx="20" fill="#fef6d3" stroke="${dd?'#c93c3c':'#111'}" stroke-width="${dd?5:2.5}"/><text x="${cx}" y="248" font-size="12" font-weight="800" style="fill:#12304f">Ruangan ${i+1}</text><text x="${cx}" y="265" font-size="11" font-weight="800" style="fill:#12304f">${cidr(D.N[i])}</text>`;
+    rm.h.forEach((h,k)=>o+=ppl(cx,288+k*30,ip(h),11));
+  });
+  return o;
+}
+function qSvg(D){return `<svg viewBox="0 0 840 392" role="img" aria-label="Topologi">${qInner(D)}</svg>`}
+function imap(D){const m={},{lk,rooms}=D;
+  m[ip(lk[0].l)]={r:-1,link:0};
+  [0,1,2].forEach(i=>{m[ip(lk[i].r)]={r:i,link:i};if(i<2)m[ip(lk[i+1].l)]={r:i,link:i+1};m[ip(rooms[i].r)]={r:i,room:i};rooms[i].h.forEach(h=>m[ip(h)]={host:1})});
+  return m}
+function jGw(D,v){v=v.trim();if(v===ip(D.gw))return{ok:true};
+  if(!/^\d{1,3}(\.\d{1,3}){3}$/.test(v))return{msg:'Format IP belum benar. Tulis seperti 10.1.2.3 (tanpa /prefix).'};
+  const f=imap(D)[v],s=D.s;
+  if(!f)return{msg:D.N.some(n=>ip(n.b)===v)?'Itu alamat network, bukan IP interface router.':'IP itu tidak ada di topologi. Cari IP interface router seberang di gambar.'};
+  if(f.host)return{msg:'Itu IP host (komputer di dalam network), bukan interface router.'};
+  if(f.r===s)return{msg:`Itu IP milik ${nmOf(D)} sendiri. Gateway harus IP interface router seberang (next hop), bukan IP interface router sendiri.`};
+  if(f.link!=null&&(f.link===s||f.link===s+1))return{msg:`Itu IP interface ${f.r<0?'ISP':'Router '+D.R[f.r].name}, router yang terhubung langsung tapi di arah yang salah, bukan router seberang menuju tujuan. Tujuan ada di sisi ${D.dir<0?'kiri':'kanan'}.`};
+  return{msg:`${nmOf(D)} tidak punya IP satu subnet dengan ${v}, jadi route berflag U (unreachable). Pakai IP interface router seberang (next hop), yaitu router di ujung link yang terhubung langsung.`};
+}
+function jDst(D,v){v=v.trim();if(v===D.dst)return{ok:true};
+  if(!/^\d{1,3}(\.\d{1,3}){3}\/\d{1,2}$/.test(v))return{msg:'Tulis alamat network dengan prefix, contoh 10.1.2.0/24.'};
+  if(D.d.room==null)return{msg:'Tujuan Internet ditulis 0.0.0.0/0.'};
+  const a=v.split('/')[0];
+  if(imap(D)[a])return{msg:'Itu IP perangkat, bukan alamat network. Pakai alamat network yang bertanda merah.'};
+  if(a===ip(D.N[D.d.room].b))return{msg:'Prefix belum sesuai dengan network di gambar.'};
+  return{msg:`Bukan IP Network tujuan (Ruangan ${D.d.room+1})`};
+}
+function hints(D){return[
+  `dst-address = alamat network yang bertanda merah (Internet = 0.0.0.0/0). Gateway = IP interface router seberang (next hop), yaitu router di ujung link yang terhubung langsung ke ${nmOf(D)}.`,
+  `Tujuan ada di sisi ${D.dir<0?'kiri':'kanan'} ${nmOf(D)}. Keluar lewat interface ether${D.ourEth}.`,
+  `Lihat link ${cidr(D.lk[D.li].n)}. IP interface ${D.nbName} di ujung link itu adalah gateway-nya.`]}
+let clock=null;const fmt=ms=>{const t=Math.floor(ms/1000);return String(Math.floor(t/60)).padStart(2,'0')+':'+String(t%60).padStart(2,'0')};
+function stopClock(){clearInterval(clock);clock=null}
+function bar(){
+  if(S.mode==='tes')return `<div class="bar"><span class="who">${esc(S.nama)} - Kelas ${esc(S.kelas)}</span><span>Waktu <b id="tm">${fmt(S.t0?Date.now()-S.t0:0)}</b></span><span>Soal <b>${S.qi}</b> dari ${S.total}</span><button id="bx" onclick="keluarT()">Keluar</button></div>`;
+  return `<div class="bar"><span>Mode Latihan</span><button onclick="home()">Menu</button></div>`;
+}
+function home(){app.className='wrap';stopClock();S={};
+  const I=d=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
+  app.innerHTML=`<div class="hm">
+  <div class="hero"><div><span class="chip">MIKROTIK ROUTEROS</span><h1>Latihan Gateway Static Route</h1><p>Pahami cara menentukan <b>dst-address</b> dan <b>gateway</b> pada routing statis, dari penjelasan sampai tes.</p></div>
+   <svg class="hero-art" viewBox="0 0 250 150" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <rect x="8" y="50" width="62" height="46" rx="10" fill="rgba(255,255,255,.18)"/><rect x="94" y="50" width="62" height="46" rx="10" fill="rgba(255,255,255,.18)"/><rect x="180" y="50" width="62" height="46" rx="10" fill="rgba(255,255,255,.18)"/>
+    <path d="M70 73h24M156 73h24" opacity=".8"/><path d="M39 50V24h172v26" stroke-dasharray="2 8" opacity=".9"/><path d="M203 34l8 -10 -2 14" opacity=".9"/>
+    <circle cx="39" cy="73" r="7" fill="currentColor" stroke="none"/><path d="M39 96v22M125 96v22M211 96v22" opacity=".6"/></svg></div>
+  <div class="tiles">
+   <div class="tile"><div class="ico">${I('<path d="M8 5v14l11-7z"/>')}</div><h2>Penjelasan</h2><p>Animasi langkah demi langkah cara menentukan gateway dan menulis perintahnya.</p><button class="p cta" onclick="openAnim(gen())">Buka</button></div>
+   <div class="tile"><div class="ico">${I('<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/>')}</div><h2>Mode Latihan</h2><p>Jawab soal acak dengan umpan balik dan hint di setiap jawaban.</p><button class="p cta" onclick="startL()">Mulai latihan</button></div>
+   <div class="tile"><div class="ico">${I('<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4h6v3H9zM9 12l2 2 4-4"/>')}</div><h2>Mode Tes</h2><p>Isi nama dan kelas, lalu kerjakan soal. Hasil tampil di akhir tes.</p>
+    <label for="nm">Nama lengkap</label><input id="nm" maxlength="40" autocomplete="off">
+    <label for="kl">Kelas</label><input id="kl" maxlength="15" placeholder="contoh: XI TJKT 1" autocomplete="off">
+    <div id="err" class="sm" style="color:var(--bad);min-height:1.4em"></div><button class="p cta" onclick="startT()">Mulai tes</button></div>
+  </div></div>`;
+}
+function startL(){S={mode:'latihan',qi:0,score:0};nextQ()}
+function startT(){const nama=$('nm').value.trim(),kelas=$('kl').value.trim();
+  if(nama.length<2||!kelas){$('err').textContent='Isi nama lengkap dan kelas dulu.';return}
+  S={mode:'tes',nama,kelas,qi:0,score:0,total:10,log:[]};readyT()}
+function readyT(){app.className='wrap';
+  app.innerHTML=`<div class="bar"><span class="who">${esc(S.nama)} - Kelas ${esc(S.kelas)}</span><span>Waktu <b id="tm">00:00</b></span><button id="bx" onclick="keluarT()">Keluar</button></div>
+  <div class="pad"><h1>Siap mulai tes?</h1><p class="mut">Ada ${S.total} soal. Waktu mulai berjalan setelah kamu menekan Mulai. Topologi dan IP baru ditampilkan setelah itu.</p>
+  <div class="row"><button class="p" onclick="beginT()">Mulai</button></div></div>`;
+}
+function beginT(){S.t0=Date.now();stopClock();clock=setInterval(()=>{const e=$('tm');if(e)e.textContent=fmt(Date.now()-S.t0)},500);nextQ()}
+function keluarT(){const b=$('bx');if(b.dataset.c){stopClock();home();return}b.dataset.c=1;b.textContent='Yakin keluar?';setTimeout(()=>{if(b.isConnected){b.textContent='Keluar';delete b.dataset.c}},3500)}
+function nextQ(){S.qi++;if(S.mode==='tes'&&S.qi>S.total)return finish();S.D=gen();S.h=0;S.done=false;showQ()}
+function showQ(){app.className='wrap q';const D=S.D,t=S.mode==='tes';
+  app.innerHTML=`${bar()}<div class="qt">Konfigurasi Routing Statis dari ${nmOf(D)} ke ${D.d.room!=null?'Ruangan '+(D.d.room+1):'Internet'}</div><div class="topo">${qSvg(D)}</div>
+  <div class="dock">
+   <div id="fb" class="fb" role="status"></div>
+   <div id="cli" class="cmd" aria-live="polite"></div>
+   <div class="dk">
+    <div class="ans">
+     <div class="f"><label for="dst">dst-address</label><input id="dst" autocomplete="off" autocapitalize="off" spellcheck="false" inputmode="decimal"></div>
+     <div class="f"><label for="gw">gateway</label><input id="gw" autocomplete="off" autocapitalize="off" spellcheck="false" inputmode="decimal"></div>
+    </div>
+    <div class="btns"><button class="p" id="bc" onclick="cek()">${t?'Jawab dan lanjut':'Cek jawaban'}</button>${t?'':'<button id="bh" onclick="hint()">Hint</button>'}
+    <button id="ba" style="display:none" onclick="openAnim(S.D,1)">Lihat penjelasannya</button><button id="bn" class="p" style="display:none" onclick="nextQ()">Soal berikutnya</button></div>
+   </div></div>`;
+  $('dst').focus();[$('dst'),$('gw')].forEach(e=>e.addEventListener('keydown',x=>{if(x.key==='Enter')cek()}));
+}
+function fb(c,h){const f=$('fb');f.className='fb '+c;f.innerHTML=h}
+function lock(){$('dst').disabled=$('gw').disabled=true;$('bc').style.display='none';const h=$('bh');if(h)h.style.display='none';$('bn').style.display='';$('ba').style.display=''}
+function cek(){if(S.done)return;const D=S.D,d=$('dst').value,g=$('gw').value;
+  if(!d.trim()||!g.trim()){fb('bad','Isi dst-address dan gateway dulu.');return}
+  const rd=jDst(D,d),rg=jGw(D,g),ok=!!(rd.ok&&rg.ok);
+  if(S.mode==='tes'){S.log.push({D,d:d.trim(),g:g.trim(),ok,okd:!!rd.ok,okg:!!rg.ok});if(ok)S.score++;return nextQ()}
+  if(ok){S.done=true;if(!S.shown)S.score++;S.shown=false;fb('ok',`Benar. Gateway ${nmOf(D)} adalah <code>${ip(D.gw)}</code>, IP interface ${D.nbName} di link ${cidr(D.lk[D.li].n)}.`);$('dst').classList.add('okk');$('gw').classList.add('okk');
+    const c=$('cli');c.innerHTML=`<span class="k">/ip route add</span> <span class="k">dst-address=</span><span class="v">${esc(D.dst)}</span> <span class="k">gateway=</span><span class="v">${ip(D.gw)}</span>`;c.style.display='block';lock()}
+  else fb('bad',[!rd.ok&&'<b>dst-address:</b> '+rd.msg,!rg.ok&&'<b>gateway:</b> '+rg.msg].filter(Boolean).join('<br>'));
+}
+function hint(){const D=S.D,hs=hints(D);
+  if(S.h<3){fb('hint','<b>Hint '+(S.h+1)+':</b> '+hs[S.h]);S.h++;if(S.h===3)$('bh').textContent='Lihat jawaban'}
+  else{S.done=true;fb('hint',`Jawabannya: dst-address <code>${D.dst}</code>, gateway <code>${ip(D.gw)}</code>. Soal ini tidak dihitung benar.`);lock()}
+}
+function finish(){app.className='wrap';stopClock();const dur=Date.now()-S.t0,sc=S.score,tot=S.total,nilai=Math.round(sc/tot*100);
+  const st=o=>o?'<span class="good">Benar</span>':'<span class="wrong">Salah</span>';
+  const rows=S.log.map((e,i)=>`<tr><td>${i+1}</td><td>${nmOf(e.D)} ke ${e.D.d.room!=null?'Ruangan '+(e.D.d.room+1):'Internet'}</td><td><code>${esc(e.d)}</code><br>${st(e.okd)}</td><td><code>${esc(e.g)}</code><br>${st(e.okg)}</td></tr>`).join('');
+  app.innerHTML=`<div class="pad"><div class="card"><h1>Hasil Tes Gateway</h1>
+   <p><span class="chip"><b>Nama:</b> ${esc(S.nama)}</span><span class="chip"><b>Kelas:</b> ${esc(S.kelas)}</span><span class="chip"><b>Waktu:</b> ${fmt(dur)}</span><span class="chip">${new Date().toLocaleString('id-ID')}</span></p>
+   <div class="row" style="align-items:flex-end"><div><div class="big">${nilai}</div><div class="mut">nilai</div></div><div style="margin-left:18px"><b>${sc}</b> benar dari ${tot} soal</div></div></div>
+  <div class="card"><h2>Rincian jawaban</h2><table><tr><th>No</th><th>Soal</th><th>Dst-Address</th><th>Gateway</th></tr>${rows}</table></div>
+  <div class="row noprint"><button class="p" onclick="window.print()">Cetak atau simpan PDF</button><button onclick="home()">Kembali ke menu</button></div></div>`;
+}
+home();
+</script></body></html>
