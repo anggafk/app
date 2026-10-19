@@ -102,6 +102,7 @@ button.p{background:linear-gradient(135deg,var(--pri),var(--acc));border-color:t
 .big{font-size:3.6rem;background:linear-gradient(135deg,var(--pri),var(--acc));-webkit-background-clip:text;background-clip:text;color:transparent}
 table{border-collapse:separate;border-spacing:0;overflow:hidden;border:1px solid var(--line);border-radius:14px}
 th{font-size:.78rem;text-transform:uppercase;letter-spacing:.05em;color:var(--mut);background:var(--bg)}td,th{padding:10px 12px}tr:last-child td{border-bottom:0}tr:nth-child(even) td{background:rgba(127,150,175,.07)}
+.topo{touch-action:pan-y;cursor:grab;scrollbar-width:none;-ms-overflow-style:none;overscroll-behavior-x:contain}.topo::-webkit-scrollbar{display:none}.topo.drag{cursor:grabbing;user-select:none}
 @media print{.pad>.card,.bar+.pad{box-shadow:none}.big{color:var(--acc);-webkit-text-fill-color:currentColor;background:none}}
 @media print{.noprint,.bar button,#ovl{display:none!important}body{background:#fff}}
 </style></head>
@@ -307,5 +308,18 @@ function finish(){app.className='wrap';stopClock();const dur=Date.now()-S.t0,sc=
   <div class="card"><h2>Rincian jawaban</h2><table><tr><th>No</th><th>Soal</th><th>Dst-Address</th><th>Gateway</th></tr>${rows}</table></div>
   <div class="row noprint"><button class="p" onclick="window.print()">Cetak atau simpan PDF</button><button onclick="home()">Kembali ke menu</button></div></div>`;
 }
+/* geser topologi (drag kiri-kanan) */
+(()=>{let d=null,raf=0;
+ const stop=()=>{cancelAnimationFrame(raf);raf=0};
+ const end=e=>{if(!d||(e&&e.pointerId!==d.id))return;const t=d.t;t.classList.remove('drag');let v=d.v;d=null;
+  if(Math.abs(v)<.15)return;const step=()=>{t.scrollLeft-=v*16;v*=.92;if(Math.abs(v)>.02)raf=requestAnimationFrame(step)};raf=requestAnimationFrame(step)};
+ document.addEventListener('pointerdown',e=>{const t=e.target.closest&&e.target.closest('.topo');stop();
+  if(!t||t.scrollWidth<=t.clientWidth+1||(e.pointerType==='mouse'&&e.button!==0))return;
+  d={t,id:e.pointerId,x:e.clientX,l:t.scrollLeft,lx:e.clientX,lt:performance.now(),v:0,cap:0}});
+ document.addEventListener('pointermove',e=>{if(!d||e.pointerId!==d.id)return;const dx=e.clientX-d.x;
+  if(!d.cap){if(Math.abs(dx)<4)return;d.cap=1;d.t.classList.add('drag');try{d.t.setPointerCapture(e.pointerId)}catch(_){}}
+  d.t.scrollLeft=d.l-dx;const n=performance.now(),dt=n-d.lt;if(dt>0){d.v=.8*d.v+.2*((e.clientX-d.lx)/dt);d.lx=e.clientX;d.lt=n}});
+ document.addEventListener('pointerup',end);document.addEventListener('pointercancel',end);
+})();
 home();
 </script></body></html>
